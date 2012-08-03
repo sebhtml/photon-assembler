@@ -1,0 +1,25 @@
+De novo assembly of long reads with insertions and deletions
+
+The error rate is 15%.
+
+25.00% -> 1 in 4 bases is wrong
+20.00% -> 1 in 5 bases is wrong
+16.66% -> 1 in 6 bases is wrong
+14.28% -> 1 in 7 bases is wrong
+4.76% -> 1 in 21 bases is wrong
+3.22% -> 1 in 31 bases is wrong
+
+There are 1024 words of length 5. We can assume that
+they will all be occurring in the reads.
+
+Given two reads, that should overlap, then there should be
+some common words. For pairs of 2 words, the universe has a size
+of 1048576. The problem is that the distance between two common words
+will be different because of indel errors.
+
+One possibility is to build a de Bruijn graph with a k-mer length 
+of 6. But then, we will simply have a complete graph because of
+sequencing errors and because of the small size of the universe.
+
+However, reads can be annotated onto this de Bruijn graph.
+The useful thing is the use 
