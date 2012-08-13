@@ -1,11 +1,11 @@
 CXX=mpicxx
-CXXFLAGS=-Wall -std=c++98 -I RayPlatform -I . 
+CXXFLAGS=-Wall -std=c++98 -I RayPlatform -I . -O3
 APP=photon
 
 all: $(APP)
 
 photon: RayPlatform/libRayPlatform.a
-	$(CXX) $(CXXFLAGS) plugins/TwinProcessor/Kmer.cpp plugins/TwinProcessor/Reader.cpp photon.cpp plugins/TwinProcessor/common_functions.cpp  plugins/TwinProcessor/TwinProcessor.cpp -o $(APP)  RayPlatform/libRayPlatform.a 
+	$(CXX) $(CXXFLAGS) plugins/TwinProcessor/TwinData.cpp plugins/TwinProcessor/Kmer.cpp  plugins/TwinProcessor/Sequence.cpp  photon.cpp plugins/TwinProcessor/common_functions.cpp  plugins/TwinProcessor/Reader.cpp plugins/TwinProcessor/ReaderImplementationFastq.cpp plugins/TwinProcessor/TwinProcessor.cpp -o $(APP)  RayPlatform/libRayPlatform.a 
 
 
 
@@ -15,4 +15,6 @@ RayPlatform/libRayPlatform.a:
 clean: 
 	rm $(APP)
 
+test:
+	./photon photon.conf
 

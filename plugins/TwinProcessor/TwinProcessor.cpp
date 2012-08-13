@@ -1,3 +1,22 @@
+/*
+ 	photon -- a distributed de novo assembler for long erroneous Pacific Biosciences reads
+    Copyright (C) 2012  Sébastien Boisvert
+
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You have received a copy of the GNU General Public License
+    along with this program (gpl-3.0.txt).  
+	see <http://www.gnu.org/licenses/>
+*/
+
 
 #include <string.h>
 #include <fstream>
@@ -119,7 +138,11 @@ void TwinProcessor::__processSequences(){
 	if(!m_processedSequencesStarted){
 
 		m_openedFile=false;
+		m_sequences=0;
 		m_fileNumber=0;
+		m_period=100;
+		m_sequencesInFile=0;
+		m_twinData.configure();
 
 		m_processedSequencesStarted=true;
 
@@ -128,16 +151,42 @@ void TwinProcessor::__processSequences(){
 		if(!m_openedFile){
 			m_reader.open(&(m_files[m_fileNumber]));
 
+			cout<<"Opening "<<m_files[m_fileNumber]<<endl;
+
+			Sequence sequence;
+
+			while(m_reader.hasNext()){
+				m_sequencesInFile++;
+				m_reader.getNext(&sequence);
+			}
+			m_reader.close();
+
+			m_reader.open(&(m_files[m_fileNumber]));
+
 			m_openedFile=true;
 		}
 
 		if(m_reader.hasNext()){
 			Sequence sequence;
 			m_reader.getNext(&sequence);
+			
+			m_twinData.push(&sequence);
+
+			if(m_sequences%m_period==0){
+				printProcessedSequences();
+			}
+
+			m_sequences++;
 		}else{
 			m_reader.close();
 
+			m_twinData.printState();
+
+			printProcessedSequences();
+
+			m_sequencesInFile=0;
 			m_openedFile=false;
+			m_sequences=0;
 			m_fileNumber++;
 		}
 
@@ -145,4 +194,10 @@ void TwinProcessor::__processSequences(){
 
 		m_processedSequences=true;
 	}
+}
+
+void TwinProcessor::printProcessedSequences(){
+
+	cout<<"Processed "<<m_sequences<<"/"<<m_sequencesInFile<<" sequences (";
+	cout<<m_sequences*100.0/m_sequencesInFile<<"%)"<<endl;
 }
